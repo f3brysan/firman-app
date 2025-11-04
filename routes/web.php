@@ -21,3 +21,4 @@ Route::get('/', function () {
 
 Route::resource('customers', MsPelangganController::class)->names('customers');
 Route::resource('billing-transactions', BillingTransactionController::class)->names('billing-transactions');
+Route::post('billing-transactions/import', [BillingTransactionController::class, 'import'])->name('billing-transactions.import');

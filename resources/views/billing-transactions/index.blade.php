@@ -10,7 +10,10 @@
 
         </div>
         <div class="card-body">
-            <div class="d-flex justify-content-end">
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#bulkImportModal">
+                    <i class="mdi mdi-upload me-1"></i> Bulk Import Excel
+                </button>
                 <a href="{{ route('billing-transactions.create') }}" class="btn btn-primary">
                     <i class="mdi mdi-plus me-1"></i> Add Transaction
                 </a>
@@ -32,6 +35,24 @@
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
@@ -66,14 +87,14 @@
                                 </td>
                                 <td>
                                     @if (isset($transaction->total))
-                                        Rp{{ number_format($transaction->total, 0, ',', '.') }}
+                                        Rp {{ number_format($transaction->total, 0, ',', '.') }}
                                     @else
                                         -
                                     @endif
                                 </td>
                                 <td>
                                     @if (isset($transaction->harga_satuan))
-                                        Rp{{ number_format($transaction->harga_satuan, 0, ',', '.') }}
+                                        Rp {{ number_format($transaction->harga_satuan, 0, ',', '.') }}
                                     @else
                                         -
                                     @endif
@@ -108,6 +129,46 @@
             </div>
         </div>
     </div>
+
+    <!-- Bulk Import Modal -->
+    <div class="modal fade" id="bulkImportModal" tabindex="-1" aria-labelledby="bulkImportModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bulkImportModalLabel">Bulk Import Billing Transactions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('billing-transactions.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="excel_file" class="form-label">Upload Excel File</label>
+                            <input type="file" class="form-control" id="excel_file" name="excel_file" accept=".xlsx,.xls,.csv" required>
+                            <small class="form-text text-muted">
+                                File format: Excel (.xlsx, .xls) or CSV (.csv)<br>
+                                Required columns: id_pelanggan, periode, pemakaian, total, harga_satuan
+                            </small>
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>Excel Format:</strong><br>
+                            Row 1 should contain headers: id_pelanggan, periode, bandwith, pemakaian, total, harga_satuan<br>
+                            Data should start from row 2.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{{ asset('template/bulk_transaction_template_excel.xlsx') }}" class="btn btn-outline-primary" download>
+                            <i class="mdi mdi-download me-1"></i> Download Template
+                        </a>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="mdi mdi-upload me-1"></i> Import
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
     <script>
         $(document).ready(function() {
