@@ -177,6 +177,7 @@ class BillingTransactionController extends Controller
                             'pemakaian' => isset($row['pemakaian']) && $row['pemakaian'] !== '' ? (float)$row['pemakaian'] : null,
                             'total' => isset($row['total']) && $row['total'] !== '' ? (float)$row['total'] : null,
                             'harga_satuan' => isset($row['harga_satuan']) && $row['harga_satuan'] !== '' ? (float)$row['harga_satuan'] : null,
+                            'harga_normal' => isset($row['harga_normal']) && $row['harga_normal'] !== '' ? (float)$row['harga_normal'] : null,
                         ]
                     );
 
@@ -242,7 +243,7 @@ class BillingTransactionController extends Controller
         }, $headers);
 
         // Check required columns
-        $requiredColumns = ['id_pelanggan', 'periode', 'bandwith', 'pemakaian', 'total', 'harga_satuan'];
+        $requiredColumns = ['id_pelanggan', 'periode', 'bandwith', 'pemakaian', 'total', 'harga_satuan', 'harga_normal'];
         foreach ($requiredColumns as $required) {
             if (!in_array($required, $headers)) {
                 throw new \Exception("Required column '{$required}' not found in CSV file.");
