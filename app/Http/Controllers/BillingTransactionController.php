@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BillingTransaction;
+use App\Models\Regions;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use App\Models\BillingTransaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -165,7 +166,10 @@ class BillingTransactionController extends Controller
                         $errorCount++;
                         continue;
                     }
-
+                    $row['total'] = str_replace(',', '', $row['total']);
+                    $row['harga_satuan'] = str_replace(',', '', $row['harga_satuan']);
+                    $row['harga_normal'] = str_replace(',', '', $row['harga_normal']);
+                    
                     // Update or create billing transaction based on customer_id and periode
                     BillingTransaction::updateOrCreate(
                         [
@@ -327,5 +331,34 @@ class BillingTransactionController extends Controller
         }
 
         return $data;
+    }
+
+    public function export($periode)
+    {
+		$billingTransactions = BillingTransaction::with('customer')->where('periode', $periode);
+		
+		$regions = Regions::all();
+
+		$data = [];
+		foreach ($regions as $region) {
+			// Join the customers table and filter by region_id
+			$transactions = BillingTransaction::whereHas('customer', function ($query) use ($region) {
+				$query->where('region_id', $region->id);
+			})->where('periode', $periode)->with('customer')->get();
+
+			$data[$region->name] = $transactions;
+		}
+
+		$html = view('billing-transactions.excel-export', compact('data'))->render();
+
+		$filename = 'billing_transactions_' . $periode . '.xls';
+
+		return response($html, 200, [
+			'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
+			'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+			'Cache-Control' => 'max-age=0, no-cache, no-store, must-revalidate',
+			'Pragma' => 'no-cache',
+			'Expires' => '0',
+		]);
     }
 }

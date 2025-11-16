@@ -11,6 +11,11 @@
         </div>
         <div class="card-body">
             <div class="d-flex justify-content-end gap-2">
+               @if (!empty($billingTransactions->count()))
+                   <a href="{{ route('billing-transactions.export', request('periode')) }}" class="btn btn-info" target="_blank">
+                    <i class="mdi mdi-download me-1"></i> Export Excel
+                </a>
+               @endif
                 <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#bulkImportModal">
                     <i class="mdi mdi-upload me-1"></i> Bulk Import Excel
                 </button>
@@ -151,7 +156,7 @@
                         </div>
                         <div class="alert alert-info">
                             <strong>Excel Format:</strong><br>
-                            Row 1 should contain headers: id_pelanggan, periode, bandwith, pemakaian, total, harga_satuan<br>
+                            Row 1 should contain headers: id_pelanggan, periode, bandwith, pemakaian, total, harga_satuan, harga_normal<br>
                             Data should start from row 2.
                         </div>
                     </div>
