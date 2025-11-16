@@ -294,7 +294,7 @@ class BillingTransactionController extends Controller
         }, $rows[0]);
 
         // Check required columns
-        $requiredColumns = ['id_pelanggan', 'periode', 'bandwith', 'pemakaian', 'total', 'harga_satuan'];
+        $requiredColumns = ['id_pelanggan', 'periode', 'bandwith', 'pemakaian', 'total', 'harga_satuan', 'harga_normal'];
         foreach ($requiredColumns as $required) {
             if (!in_array($required, $headers)) {
                 throw new \Exception("Required column '{$required}' not found in Excel file.");
